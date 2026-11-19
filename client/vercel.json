@@ -1,0 +1,20 @@
+{
+  "redirects": [
+    {
+      "source": "/smartedu",
+      "destination": "/adaptiq",
+      "permanent": true
+    },
+    {
+      "source": "/smartedu/:path*",
+      "destination": "/adaptiq/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
