@@ -1,0 +1,17 @@
+SECTION,Unit_Number,Unit_Title,Topics_Covered,CO_Mapped,Blooms_Level,GATE_Topic,GATE_Priority,Weightage_Trend,Curricular_Gap
+CURRICULUM_MAP,Unit 1,Introduction to DBMS & DDL/DML,DBMS Architecture; 3-Schema; Data Independence; DDL/DML; Constraints; 3VL Logic,CO1; CO2,L2-L3,Integrity Constraints & Relational Model,Medium,1-2 Marks,In College: SQL*Plus & Oracle GUI. In GATE: 3-Valued Logic NULL semantics.
+CURRICULUM_MAP,Unit 2,Relational Query Languages & Advanced SQL,Relational Algebra; Tuple Calculus; Aggregations; GROUP BY; Joins; Nested Queries,CO2; CO3,L3-L5,Relational Algebra; Tuple Calculus; SQL,Must-Do,2-4 Marks,In College: String/Date functions & Views. In GATE: Relational Division & TRC Safety.
+CURRICULUM_MAP,Unit 3,ER Modeling & Relational Design,ER Diagrams; Candidate Keys; Functional Dependencies; Normal Forms 1NF-BCNF; Lossless Decomposition,CO3; CO4,L3-L5,ER-Model; Normal Forms; Functional Dependencies,Must-Do,3-5 Marks,In College: CASE tool drawing. In GATE: Chase Tableau & Candidate key combinatorics.
+CURRICULUM_MAP,Unit 4,Transaction Processing & Concurrency,ACID; Conflict/View Serializability; 2PL Protocols; Recoverability; Deadlocks; Logging,CO4; CO5,L3-L5,Transactions & Concurrency Control; Serializability; 2PL,Must-Do,2-4 Marks,In College: SAVEPOINT commands. In GATE: Topological DAG sorting & Strictness proofs.
+CURRICULUM_MAP,Unit 5,Database Programming Constructs,PL/SQL Blocks; Cursors; Stored Procedures; Triggers; Packages,CO5,L3,Not in GATE Syllabus,Skip,0 Marks,Complete College lab topic; 0% representation in GATE CSE.
+CURRICULUM_MAP,Unit 6,Storage Structures & Indexing,File Organization; Index Types; B-Trees; B+ Trees; Hashing,CO6,L3-L4,File organization; Indexing (B and B+ trees),Must-Do,2-3 Marks,In College: Subjective descriptions. In GATE: Hardware block order formulas & Range I/Os.
+TREND_ANALYSIS,2017,1,3,7,Relational Algebra Division; BCNF Decomposition; Precedence Graph; B+ Tree Node Order,3,0,1
+TREND_ANALYSIS,2018,2,3,8,Tuple Relational Calculus; Conflict Serializability; SQL Nested Correlated; B+ Tree Height,3,0,2
+TREND_ANALYSIS,2019,2,2,6,Candidate Keys Count; Strict 2PL; SQL GROUP BY HAVING; Foreign Key Cascading,2,0,2
+TREND_ANALYSIS,2020,1,3,7,Lossless Join & Dependency Preservation; View Serializability; B+ Tree Record Count; RA Equivalence,3,0,1
+TREND_ANALYSIS,2021,2,3,8,MSQ on 2PL & Recoverability; Minimal Cover; SQL Three-Valued Logic; B-Tree Keys,2,2,1
+TREND_ANALYSIS,2022,1,3,7,MSQ on Normal Forms; Conflict Equivalent Orders; Correlated Subquery Output; B+ Tree Order,2,1,1
+TREND_ANALYSIS,2023,2,3,8,MSQ on Relational Algebra vs TRC; BCNF vs 3NF; Log Recovery Redo/Undo; Precedence Graph,2,2,1
+TREND_ANALYSIS,2024,2,3,8,MSQ on Index Types; B+ Tree Search I/Os; Candidate Keys with Multiple FDs; Thomas Write Rule,2,2,1
+TREND_ANALYSIS,2025,1,3,7,MSQ on ACID & Serializability; Canonical Cover; SQL Join Cardinality; B+ Tree Leaves,2,1,1
+TREND_ANALYSIS,2026,2,3,8,MSQ on B+ Trees & Concurrency; Lossless Decomposition; TRC Quantifier Negation; SQL 3VL,2,2,1

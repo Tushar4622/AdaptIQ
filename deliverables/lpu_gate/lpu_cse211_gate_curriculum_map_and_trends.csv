@@ -1,0 +1,17 @@
+SECTION,Unit_Number,Unit_Title,Topics_Covered,CO_Mapped,Blooms_Level,GATE_Topic,GATE_Priority,Weightage_Trend,Curricular_Gap
+CURRICULUM_MAP,Unit 1,Introduction to Digital Systems & RTL,RTL Notation; Micro-operations; Arithmetic Logic Unit; Verilog HDL Basics,CO1; CO2,L2-L3,ALU Design & 2's Complement Arithmetic,Medium,1-2 Marks,In College: Verilog syntax and testbenches. In GATE: Overflow Boolean logic and CLA adder delays.
+CURRICULUM_MAP,Unit 2,Basic Computer Organization & Control,Instruction Cycle; Common Bus; Hardwired Control; Microprogrammed Control; LMC,CO2; CO3,L2-L4,Control Unit Design & Data-Path Scheduling,Must-Do,2-3 Marks,In College: LMC simulator & Mano machine hex codes. In GATE: Control store size & microcode field compression.
+CURRICULUM_MAP,Unit 3,CPU & Instruction Formats,Addressing Modes; Expanding Opcode; Register Files; Stack; RISC vs CISC; Overlapping Windows,CO3,L3-L5,Addressing Modes & Machine Instructions,Must-Do,2-4 Marks,In College: Subjective RISC/CISC essays. In GATE: Expanding opcode boundaries & PC-relative offset math.
+CURRICULUM_MAP,Unit 4,Input-Output Organization & DMA,Memory-Mapped vs Isolated I/O; Interrupts; DMA Cycle Stealing; UART; IOP,CO4,L3-L4,I/O Interface (Interrupt and DMA mode),Must-Do,2-3 Marks,In College: UART baud rate registers & IOP channels. In GATE: DMA CPU slowdown % and ISR latency cycles.
+CURRICULUM_MAP,Unit 5,Cache Memory & Instruction Pipelining,Cache Mapping (Direct/Set-Assoc); AMAT; Write Policies; Pipelining; Hazards; Forwarding,CO5; CO6,L3-L5,Cache Memory Hierarchy & Instruction Pipelining,Must-Do,4-6 Marks,In College: Basic cache hit definitions. In GATE: Tag directory overhead; multi-level AMAT; forwarding stall cycles.
+CURRICULUM_MAP,Unit 6,Advanced Architecture Trends,GPU Architecture; Nvidia CUDA; Supercomputers; Quantum Computing Qubits,CO6,L2,Not in GATE Syllabus,Skip,0 Marks,Complete College survey topic; 0% representation in GATE CSE.
+TREND_ANALYSIS,2017,2,4,10,Cache Set-Associative Tag; Pipeline RAW Hazards & Forwarding; Addressing Modes; DMA Cycle Stealing,4,0,2
+TREND_ANALYSIS,2018,2,3,8,Pipeline Stalls with Branching; Cache AMAT; Microprogrammed Control Store Size; Expanding Opcode,3,0,2
+TREND_ANALYSIS,2019,3,3,9,Set-Associative Tag Directory Size; Instruction Pipelining Speedup; Memory-Mapped I/O; 2's Complement Overflow,3,0,3
+TREND_ANALYSIS,2020,2,4,10,Multi-Level Cache AMAT; Pipeline Hazards with Load-Use; Addressing Modes EA; DMA Transfer Overhead,4,0,2
+TREND_ANALYSIS,2021,2,4,10,MSQ on Pipeline Hazards; Cache Hit Ratio; Expanding Opcode Combinatorics; Microinstruction Sizing,3,2,1
+TREND_ANALYSIS,2022,2,3,8,MSQ on Cache Policies (Write-back/through); Pipeline Clock Frequency; DMA Cycle Stealing; PC-Relative Offset,2,1,2
+TREND_ANALYSIS,2023,3,3,9,MSQ on Addressing Modes; Cache Associativity Miss Types; Pipeline CPI with Stalls; Control Memory Bits,3,2,1
+TREND_ANALYSIS,2024,2,4,10,MSQ on Pipeline Forwarding Paths; Set-Associative Cache Replacement (LRU); DMA CPU %,2,2,2
+TREND_ANALYSIS,2025,2,3,8,MSQ on Cache Tag Overheads; Branch Penalty in Pipelining; Addressing Modes Memory Cycles; EMAT with TLB,2,1,2
+TREND_ANALYSIS,2026,3,4,11,MSQ on Pipeline Structural/Data Hazards; Multi-Level Cache AMAT; Expanding Opcode; DMA Latency,3,2,2

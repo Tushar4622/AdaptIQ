@@ -1,0 +1,35 @@
+Unit,Module_Code,Topic_Name,Course_Outcome,Blooms_Level,Matching_GATE_Topic,Avg_GATE_Marks,Priority,Study_Material_Link
+Unit 1,Unit 1.1,OS Overview Goals & Services,CO1,L2 (Understand),None (Foundational context),0.0,Low,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 1,Unit 1.2,Dual-Mode Operation (User vs Kernel Mode),CO1,L2 (Understand),OS Architecture & Privileged Instructions,0.5,High,https://onlinecourses.nptel.ac.in/
+Unit 1,Unit 1.3,Evolution & Types of OS (Batch Multi Time RTOS),CO1,L1 (Remember),None (Historical classification),0.0,Low,https://onlinecourses.nptel.ac.in/
+Unit 1,Unit 1.4,System Calls & Trap Handling,CO1; CO2,L3 (Apply),System Calls & OS Interface,1.0,High,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 2,Unit 2.1,Process Concept State Lifecycle & PCB,CO1,L2 (Understand),Process States PCB & Context Switching,1.0,High,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 2,Unit 2.2,Process Creation & fork() Hierarchy,CO1; CO2,L3 (Apply),Nested fork() Trees & Child Counting,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.3,Threads & Multithreading Models (User vs Kernel),CO3,L2 (Understand),Thread Models & Isolation,1.0,High,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 2,Unit 2.4,CPU Scheduling Criteria & Dispatcher,CO2,L2 (Understand),Scheduling Criteria & Gantt Baselines,0.5,Medium,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.5,Uni-Processor Scheduling (FCFS SJF SRTF RR),CO2,L3 (Apply); L4 (Analyze),CPU Scheduling Algorithms (SRTF RR),2.0,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.6,Advanced Scheduling (Multilevel Queue MLFQ),CO2,L2 (Understand),MLFQ Rules & Aging,0.5,Medium,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 3,Unit 3.1,Critical Section Problem & Peterson's Algorithm,CO3,L4 (Analyze),Critical Section Verification & Progress,2.0,Must-Do,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 3,Unit 3.2,Hardware Synchronization Primitives (TestAndSet CAS),CO3,L3 (Apply),Atomic Instructions & Spinlocks,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 3,Unit 3.3,Semaphores & Mutex (Wait and Signal Semantics),CO3,L3 (Apply); L4 (Analyze),Counting Semaphores & Concurrency Invariants,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 3,Unit 3.4,Classical IPC (Producer-Consumer Readers-Writers),CO3,L4 (Analyze),Bounded Buffer & Lock Inversions,1.0,High,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 3,Unit 3.5,Deadlock Characterization & 4 Coffman Conditions,CO4,L2 (Understand); L3 (Apply),RAG Cycles & Circular Wait Elimination,1.0,High,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 3,Unit 3.6,Banker's Algorithm & Safe Sequences,CO4,L3 (Apply); L4 (Analyze),Deadlock Avoidance & Resource Invariants,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 3,Unit 3.7,Deadlock Detection & Recovery Strategies,CO4,L2 (Understand),WFG Cycles & Minimum Resource Bounds,0.5,Medium,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.1,Address Binding Dynamic Relocation & Partitioning,CO5,L2 (Understand); L3 (Apply),Memory Allocation & Fragmentation,0.5,Medium,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 4,Unit 4.2,Paging Architecture Hardware & Frame Sizing,CO5,L3 (Apply),Paging Address Translation,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.3,TLB & Multi-Level Hierarchical Paging,CO5,L4 (Analyze),TLB EMAT & Multi-Level Bit Partitioning,2.0,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.4,Segmentation & Segmented Paging,CO5,L2 (Understand),Segment Base & Limit Violations,0.5,Medium,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 4,Unit 4.5,Virtual Memory & Demand Paging EAT,CO5,L3 (Apply),Page Fault Service & EAT Probability,1.0,Must-Do,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 4,Unit 4.6,Page Replacement Algorithms (FIFO LRU Optimal),CO5,L3 (Apply); L4 (Analyze),Page Fault Count & Belady's Anomaly,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.7,Thrashing & Working Set Strategy,CO5,L2 (Understand),Thrashing Dynamics & Multiprogramming,0.5,Medium,https://onlinecourses.nptel.ac.in/
+Unit 5,Unit 5.1,File Concept Directory Structures & Access,CO6,L2 (Understand),File Path Traversal & Hard vs Soft Links,0.5,Low,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 5,Unit 5.2,File Allocation Methods (Contiguous Linked Indexed),CO6,L3 (Apply),Block Access Overhead & Fragmentation,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 5,Unit 5.3,UNIX Inode Capacity & Indirect Block Trees,CO6,L4 (Analyze),Inode File Size & Block Access Count,1.5,Must-Do,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 5,Unit 5.4,Free Space Management (Bitmaps Linked Lists),CO6,L2 (Understand),Bitmap Space Overhead Calculation,0.5,Medium,https://onlinecourses.nptel.ac.in/
+Unit 5,Unit 5.5,Disk Structure & Hardware Latency Parameters,CO6,L2 (Understand); L3 (Apply),Average Access Time (Seek Rot Trans),1.0,High,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 5,Unit 5.6,Disk Scheduling (SSTF SCAN C-LOOK),CO6,L3 (Apply); L4 (Analyze),Total Head Traversal Calculations,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 6,Unit 6.1,Protection Domains & Access Matrix (ACLs vs Caps),CO4,L2 (Understand); L3 (Apply),Access Matrix Row vs Column Storage,0.5,Medium,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 6,Unit 6.2,System & Program Threats (Buffer Overflow),CO4,L2 (Understand),Stack Smashing Vulnerabilities,0.5,Low,https://codex.cs.yale.edu/avi/os-book/OS10/slide-dir/
+Unit 6,Unit 6.3,IPC Models (Shared Memory vs Message Passing),CO6,L3 (Apply),IPC Synchronization & Buffer Capacity,0.5,High,https://onlinecourses.nptel.ac.in/
+Unit 6,Unit 6.4,Pipes & Signal Handling Mechanics,CO6,L3 (Apply),Blocking Read/Write & SIGPIPE Semantics,1.0,High,https://onlinecourses.nptel.ac.in/

@@ -1,0 +1,32 @@
+Unit,Module_Code,Topic_Name,Course_Outcome,Blooms_Level,Matching_GATE_Topic,Avg_GATE_Marks,Priority,Study_Material_Link
+Unit 1,Unit 1.1,Asymptotic Notations & Function Growth,CO1,L2 (Understand); L4 (Analyze),Asymptotic Complexity & Growth Ordering,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 1,Unit 1.2,Recurrence Relations & Master Theorem,CO1,L3 (Apply); L4 (Analyze),Recurrence Relations for Recursion,1.5,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 1,Unit 1.3,Array Memory Representation (Row vs Col Major),CO1; CO6,L3 (Apply),Array Address Mapping Formulas,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 1,Unit 1.4,Array Search (Linear vs Binary Search),CO1; CO6,L3 (Apply),Binary Search Comparisons & Invariants,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 1,Unit 1.5,Elementary Sorting (Bubble Selection Insertion),CO1; CO6,L2 (Understand); L3 (Apply),Stability & In-Place Analysis,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.1,Memory Model & Singly Linked List (SLL),CO2; CO6,L3 (Apply); L4 (Analyze),Pointer Manipulation & In-Place Reversal,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.2,Insertion & Deletion Complexities in Lists,CO2,L3 (Apply),Time Complexity Bounds vs Arrays,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.3,Doubly Linked Lists (DLL),CO2; CO6,L3 (Apply),Pointer Modifications Count in DLL,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.4,Circular Linked Lists & Header Nodes,CO2,L2 (Understand); L3 (Apply),Circular List Pointer Edge-Cases,0.5,Medium,https://onlinecourses.nptel.ac.in/
+Unit 2,Unit 2.5,Floyd Cycle Detection & Merging Lists,CO2; CO6,L4 (Analyze),Cycle Finding & Intersection Calculation,1.5,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 3,Unit 3.1,Stack ADT & Array/List Operations,CO3,L2 (Understand); L3 (Apply),Stack Operations & Recursion Tracing,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 3,Unit 3.2,Stack Permutations & Catalan Numbers,CO3; CO6,L4 (Analyze),Valid and Invalid Output Permutations,1.5,Must-Do,https://gateoverflow.in/
+Unit 3,Unit 3.3,Expression Conversion (Infix Postfix Prefix),CO3,L3 (Apply),Postfix Evaluation & Shunting-Yard,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 3,Unit 3.4,Queue ADT & Circular Queue Modulo Indexing,CO3,L3 (Apply),Circular Queue Modulo Arithmetic,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 3,Unit 3.5,Deques & Dual-Stack Queue Implementation,CO3; CO6,L4 (Analyze),Amortized Cost of 2-Stack Queues,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.1,Binary Tree Properties & Handshaking Lemma,CO4,L2 (Understand); L3 (Apply),Leaf vs Degree-2 Node Invariants,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.2,Tree Traversals & Unique Reconstruction,CO4,L3 (Apply); L4 (Analyze),Inorder+Preorder Tree Construction,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.3,Binary Search Trees (BST) & Search Probes,CO4; CO6,L3 (Apply); L4 (Analyze),Valid BST Search Sequences & Deletion,2.0,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 4,Unit 4.4,AVL Trees Rotations & Height Bounds,CO4,L4 (Analyze),AVL Rotations & Fibonaccian Node Count,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 4,Unit 4.5,Binary Heaps & Build-Heap Linear Time,CO4; CO6,L3 (Apply); L4 (Analyze),Build-Heap Comparisons & Priority Queue,2.0,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 5,Unit 5.1,Graph Representations (Matrix vs List),CO5,L2 (Understand); L3 (Apply),Degree Bounds & Edge Query Costs,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 5,Unit 5.2,Breadth-First Search (BFS) & Shortest Path,CO5,L3 (Apply),BFS Traversal & Level Distance,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 5,Unit 5.3,Depth-First Search (DFS) & Edge Types,CO5; CO6,L4 (Analyze),DFS Back Edges & Cycle Detection,1.5,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 5,Unit 5.4,Topological Sorting & Valid DAG Sequences,CO5; CO6,L3 (Apply); L4 (Analyze),Counting Topological Orders in DAG,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 5,Unit 5.5,Minimum Spanning Trees (Kruskal & Prim),CO5; CO6,L3 (Apply); L4 (Analyze),Cut Property & MST Edge Invariants,2.0,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 5,Unit 5.6,Single-Source Shortest Path (Dijkstra),CO5; CO6,L3 (Apply); L4 (Analyze),Dijkstra Relaxation & Heap Priority,1.5,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 6,Unit 6.1,Direct Addressing & Hash Functions,CO5,L2 (Understand); L3 (Apply),Division Method & Modulo Bounds,0.5,Medium,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/
+Unit 6,Unit 6.2,Separate Chaining (Open Hashing),CO5; CO6,L3 (Apply),Load Factor Alpha & Search Complexities,1.0,High,https://onlinecourses.nptel.ac.in/
+Unit 6,Unit 6.3,Open Addressing (Linear & Quadratic Probing),CO5; CO6,L3 (Apply); L4 (Analyze),Collision Slots & Clustering Effects,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 6,Unit 6.4,Double Hashing & Relatively Prime Probes,CO5; CO6,L4 (Analyze),Double Hashing Permutation Properties,1.5,Must-Do,https://onlinecourses.nptel.ac.in/
+Unit 6,Unit 6.5,B-Trees & B+ Trees Node Capacity & Order,CO5; CO6,L3 (Apply); L4 (Analyze),Node Keys Bounds & Tree Height,1.5,Must-Do,https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/

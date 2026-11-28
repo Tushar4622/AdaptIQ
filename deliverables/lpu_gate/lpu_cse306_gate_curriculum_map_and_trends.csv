@@ -1,0 +1,17 @@
+SECTION,Unit_Number,Unit_Title,Topics_Covered,CO_Mapped,Blooms_Level,GATE_Topic,GATE_Priority,Weightage_Trend,Curricular_Gap
+CURRICULUM_MAP,Unit 1,Introduction & Network Models,OSI 7-Layer; TCP/IP Suite; Circuit vs Packet Switching; Topologies; Domains,CO1; CO2,L2-L3,Layering Concepts & Packet Switching,High,1-2 Marks,In College: RJ-45 cabling & ISO history. In GATE: Store-and-forward multi-hop delay & domain counts.
+CURRICULUM_MAP,Unit 2,Physical Layer & Delays,Transmission Delays (Tt, Tp); BDP; Nyquist/Shannon Capacity; Line Coding; PCM; TDM,CO2,L2-L3,Physical layer metrics & Channel capacity,High,1-2 Marks,In College: Optical fiber Snell's law & analog AM/FM. In GATE: Nyquist-Shannon optimization & bit length on wire.
+CURRICULUM_MAP,Unit 3,Data Link Layer & MAC Sublayer,Framing; Bit Stuffing; CRC; Hamming Code; Stop-and-Wait; GBN; Selective Repeat; CSMA/CD; Ethernet,CO3,L3-L5,Data Link Flow/Error Control & MAC (CSMA/CD),Must-Do,3-5 Marks,In College: HDLC frames & Token Ring. In GATE: CSMA/CD min frame length & sliding window sequence bits.
+CURRICULUM_MAP,Unit 4,Network Layer Addressing & Fragmentation,Classful/Classless (CIDR); Subnetting (VLSM); Longest Prefix Match; IPv4 Header; Fragmentation,CO4,L3-L5,IP Addressing (CIDR) & Packet Fragmentation,Must-Do,2-4 Marks,In College: Cisco CLI IP configuration. In GATE: 8-byte fragment offset math & CIDR VLSM inequalities.
+CURRICULUM_MAP,Unit 5,Routing & Congestion Control,Distance Vector Routing (Bellman-Ford); Link State (Dijkstra); Count-to-Infinity; Leaky/Token Bucket; ARP; ICMP,CO5,L3-L4,Routing algorithms (DVR, LSR) & Congestion control,Must-Do,2-3 Marks,In College: Cisco CLI OSPF setup. In GATE: Routing table updates after link changes & Traceroute TTL.
+CURRICULUM_MAP,Unit 6,Transport & Application Layers,TCP Header; 3-Way Handshake; Congestion Control (Tahoe/Reno); UDP; DNS; HTTP; SMTP; FTP,CO6,L3-L4,TCP/UDP & Application protocols (DNS, HTTP, SMTP),Must-Do,3-5 Marks,In College: Telnet commands & Sendmail setup. In GATE: TCP cwnd progression & HTTP persistent RTT latency.
+TREND_ANALYSIS,2017,2,3,8,Sliding Window GBN Efficiency; IPv4 Packet Fragmentation; TCP Congestion Control cwnd; CSMA/CD Frame Size,3,0,2
+TREND_ANALYSIS,2018,2,3,8,Distance Vector Routing Table; Selective Repeat Sequence Bits; HTTP Non-Persistent Latency; CRC Modulo-2,3,0,2
+TREND_ANALYSIS,2019,2,3,8,CSMA/CD Cable Length; CIDR Longest Prefix Match; TCP Sequence Number Wrap-around; Nyquist Capacity,2,0,3
+TREND_ANALYSIS,2020,2,4,10,Stop-and-Wait ARQ Efficiency; IPv4 Fragmentation Offset; TCP Reno 3 Dup ACKs; DNS Resolution RTTs,4,0,2
+TREND_ANALYSIS,2021,2,3,8,MSQ on TCP Congestion Control; Token Bucket Transmission; CIDR Subnet Partitioning; Hamming Distance,2,2,1
+TREND_ANALYSIS,2022,2,3,8,MSQ on Sliding Window Protocols; Distance Vector Count-to-Infinity; Ethernet Minimum Frame; ARP Cache,2,1,2
+TREND_ANALYSIS,2023,2,4,10,MSQ on TCP Flags & Handshake; IPv4 Header IHL & Offset; Go-Back-N Window Size; Dijkstra Link State,3,2,1
+TREND_ANALYSIS,2024,2,3,8,MSQ on HTTP Pipelining; CSMA/CD Exponential Backoff; CIDR Supernetting; CRC Error Detection Polynomials,2,2,1
+TREND_ANALYSIS,2025,2,3,8,MSQ on Transport Layer Flow Control; Packet Pipelining Delay; TCP cwnd Growth; DNS Cache Records,2,1,2
+TREND_ANALYSIS,2026,2,4,10,MSQ on CSMA/CD vs CSMA/CA; IPv4 Multi-Hop Fragmentation; Selective Repeat Sequence Numbers; TCP Reno cwnd,3,2,1
