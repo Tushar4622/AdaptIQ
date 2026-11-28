@@ -167,7 +167,7 @@ exports.updateMasterSyllabus = async (req, res, next) => {
 exports.getPersonalizedSyllabus = async (req, res, next) => {
   try {
     const { courseId } = req.params;
-    const targetStudentId = req.query.studentId || req.user._id;
+    const targetStudentId = req.targetStudentId || req.user._id;
 
     let plan = await PersonalizedPlan.findOne({
       course: courseId,

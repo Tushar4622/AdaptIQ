@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect, restrictTo } = require('../middleware/auth');
+const { requireConceptCreationAccess } = require('../middleware/objectAccess');
 const competencyCtrl = require('../controllers/competencyController');
 
 // Learner mastery & gaps endpoint (authenticated student)
@@ -23,6 +24,12 @@ router.put('/:id', protect, restrictTo('teacher', 'admin'), competencyCtrl.updat
 router.delete('/:id', protect, restrictTo('teacher', 'admin'), competencyCtrl.deleteCompetency);
 
 // Concept sub-items
-router.post('/concept', protect, restrictTo('teacher', 'admin'), competencyCtrl.createConcept);
+router.post(
+  '/concept',
+  protect,
+  restrictTo('teacher', 'admin'),
+  requireConceptCreationAccess,
+  competencyCtrl.createConcept
+);
 
 module.exports = router;

@@ -1,12 +1,37 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const { connectMongo } = require('../config/db');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const { Badge, Quiz, Competency, Concept, LearnerMastery, MasterSyllabus, SkillProfile, PersonalizedPlan, Enrollment } = require('../models/index');
 
+const isValidSeedPassword = (password) =>
+  typeof password === 'string' &&
+  password.length >= 12 &&
+  Buffer.byteLength(password, 'utf8') <= 72 &&
+  /[a-z]/.test(password) &&
+  /[A-Z]/.test(password) &&
+  /\d/.test(password) &&
+  /[^A-Za-z0-9]/.test(password);
+
+const getSeedPasswords = () => {
+  const passwords = {
+    admin: process.env.SEED_ADMIN_PASSWORD,
+    teacher: process.env.SEED_TEACHER_PASSWORD,
+    student: process.env.SEED_STUDENT_PASSWORD,
+  };
+  const invalidVariables = Object.entries(passwords)
+    .filter(([, password]) => !isValidSeedPassword(password))
+    .map(([role]) => `SEED_${role.toUpperCase()}_PASSWORD`);
+  if (invalidVariables.length > 0) {
+    throw new Error(`Missing or invalid seed password environment variables: ${invalidVariables.join(', ')}`);
+  }
+  return passwords;
+};
+
 const seed = async () => {
-  await mongoose.connect(process.env.MONGO_URI);
+  const seedPasswords = getSeedPasswords();
+  await connectMongo();
   console.log('Connected to MongoDB');
 
   // Clear existing
@@ -27,11 +52,11 @@ const seed = async () => {
 
   // Create users
   const [admin, teacher1, teacher2, student1, student2] = await User.create([
-    { name: 'Platform Admin', email: 'admin@adaptiq.com', password: 'Admin@1234', role: 'admin', institution: 'AdaptIQ', xp: 9999 },
-    { name: 'Dr. Sarah Mitchell', email: 'sarah@adaptiq.com', password: 'Teacher@1234', role: 'teacher', institution: 'MIT OpenCourseWare', bio: 'Expert in Data Science and Machine Learning with 10+ years of industry experience.' },
-    { name: 'Prof. James Carter', email: 'james@adaptiq.com', password: 'Teacher@1234', role: 'teacher', institution: 'Stanford Online', bio: 'Full-stack development expert and open-source contributor.' },
-    { name: 'Arjun Sharma', email: 'arjun@adaptiq.com', password: 'Student@1234', role: 'student', institution: 'IIT Delhi', course: 'B.Tech Computer Science', careerGoals: 'Become a Machine Learning Engineer at a top tech company', xp: 850, streak: 7 },
-    { name: 'Priya Patel', email: 'priya@adaptiq.com', password: 'Student@1234', role: 'student', institution: 'BITS Pilani', course: 'B.E. Computer Science', careerGoals: 'Frontend Developer at a product startup', xp: 1200, streak: 14 },
+    { name: 'Platform Admin', email: 'admin@adaptiq.com', password: seedPasswords.admin, role: 'admin', institution: 'AdaptIQ', xp: 9999 },
+    { name: 'Dr. Sarah Mitchell', email: 'sarah@adaptiq.com', password: seedPasswords.teacher, role: 'teacher', institution: 'MIT OpenCourseWare', bio: 'Expert in Data Science and Machine Learning with 10+ years of industry experience.' },
+    { name: 'Prof. James Carter', email: 'james@adaptiq.com', password: seedPasswords.teacher, role: 'teacher', institution: 'Stanford Online', bio: 'Full-stack development expert and open-source contributor.' },
+    { name: 'Arjun Sharma', email: 'arjun@adaptiq.com', password: seedPasswords.student, role: 'student', institution: 'IIT Delhi', course: 'B.Tech Computer Science', careerGoals: 'Become a Machine Learning Engineer at a top tech company', xp: 850, streak: 7 },
+    { name: 'Priya Patel', email: 'priya@adaptiq.com', password: seedPasswords.student, role: 'student', institution: 'BITS Pilani', course: 'B.E. Computer Science', careerGoals: 'Frontend Developer at a product startup', xp: 1200, streak: 14 },
   ]);
   console.log('✅ Users created');
 
@@ -355,7 +380,7 @@ const seed = async () => {
     { student: student1._id, course: fullStackCourse._id, progress: 45 },
     { student: student2._id, course: fullStackCourse._id, progress: 50 },
   ]);
-  console.log('✅ Enrolled Student A (Arjun) and Student B (Priya) in Full-Stack Course');
+  console.log('✅ Enrolled two sample students in the Full-Stack course');
 
   // ── Master Syllabus (Owned by Teacher, Immutable by Students) ────────────────
   const masterSyllabus = await MasterSyllabus.create({
@@ -665,7 +690,7 @@ const seed = async () => {
       },
     ],
   });
-  console.log('✅ Student A (Arjun) Personalized Plan Created (Cybersecurity Expanded at Top)');
+  console.log('✅ Sample student A personalized plan created');
 
   // ── STUDENT B (Priya): Weak in Full Stack (35%), Strong in Cybersecurity (92%) ──
   await SkillProfile.create({
@@ -756,17 +781,18 @@ const seed = async () => {
       },
     ],
   });
-  console.log('✅ Student B (Priya) Personalized Plan Created (Full Stack Expanded at Top)');
+  console.log('✅ Sample student B personalized plan created');
 
   console.log('\n🎉 Seed complete!\n');
-  console.log('─────────────────────────────────────');
-  console.log('Test Credentials:');
-  console.log('  Admin:   admin@adaptiq.com   / Admin@1234');
-  console.log('  Teacher: sarah@adaptiq.com   / Teacher@1234');
-  console.log('  Student: arjun@adaptiq.com   / Student@1234');
-  console.log('─────────────────────────────────────\n');
 
   await mongoose.disconnect();
 };
 
-seed().catch((err) => { console.error(err); process.exit(1); });
+if (require.main === module) {
+  seed().catch((err) => {
+    console.error(`[seed] failed (${err?.name || 'Error'})`);
+    process.exit(1);
+  });
+}
+
+module.exports = { getSeedPasswords, isValidSeedPassword };

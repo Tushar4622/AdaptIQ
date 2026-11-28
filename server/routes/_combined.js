@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { protect, restrictTo } = require('../middleware/auth');
+const { requireDiscussionAccess } = require('../middleware/objectAccess');
+const { auditAdminActions } = require('../middleware/securityAudit');
+const { adminRoleBodySchema, validateBody } = require('../middleware/requestValidation');
 const {
   getSkillMap,
   analyzeSkills,
@@ -52,7 +55,7 @@ badgeRouter.get('/', protect, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-badgeRouter.post('/', protect, restrictTo('admin'), async (req, res, next) => {
+badgeRouter.post('/', protect, restrictTo('admin'), auditAdminActions, async (req, res, next) => {
   try {
     const badge = await Badge.create(req.body);
     res.status(201).json({ badge });
@@ -63,7 +66,7 @@ badgeRouter.post('/', protect, restrictTo('admin'), async (req, res, next) => {
 const discussionRouter = express.Router();
 
 // Legacy course thread discussions
-discussionRouter.get('/course/:courseId', protect, async (req, res, next) => {
+discussionRouter.get('/course/:courseId', protect, requireDiscussionAccess('read'), async (req, res, next) => {
   try {
     if (!isValidObjectId(req.params.courseId)) {
       return res.status(400).json({ error: 'Invalid course ID.' });
@@ -127,7 +130,7 @@ discussionRouter.post('/', protect, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-discussionRouter.post('/:id/reply', protect, async (req, res, next) => {
+discussionRouter.post('/:id/reply', protect, requireDiscussionAccess('reply'), async (req, res, next) => {
   try {
     const discussion = await Discussion.findById(req.params.id);
     if (!discussion) return res.status(404).json({ error: 'Discussion not found.' });
@@ -527,7 +530,7 @@ userRouter.get('/students', protect, restrictTo('teacher', 'admin'), async (req,
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 const adminRouter = express.Router();
-adminRouter.use(protect, restrictTo('admin'));
+adminRouter.use(protect, restrictTo('admin'), auditAdminActions);
 
 // Import models needed by admin routes
 const { AuditLog, LearnerMastery, Concept } = require('../models/index');
@@ -578,14 +581,14 @@ adminRouter.put('/users/:id/toggle', async (req, res, next) => {
       action: 'user_toggled',
       targetType: 'User',
       targetId: user._id,
-      metadata: { userName: user.name, newStatus: user.isActive ? 'active' : 'inactive' },
+      metadata: { newStatus: user.isActive ? 'active' : 'inactive' },
     }).catch(() => {});
 
     res.json({ user });
   } catch (err) { next(err); }
 });
 
-adminRouter.put('/users/:id/role', async (req, res, next) => {
+adminRouter.put('/users/:id/role', validateBody(adminRoleBodySchema), async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -599,7 +602,7 @@ adminRouter.put('/users/:id/role', async (req, res, next) => {
       action: 'user_role_changed',
       targetType: 'User',
       targetId: user._id,
-      metadata: { userName: user.name, newRole: req.body.role },
+      metadata: { newRole: req.body.role },
     }).catch(() => {});
 
     res.json({ user });

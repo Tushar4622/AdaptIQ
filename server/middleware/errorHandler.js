@@ -1,5 +1,7 @@
+const { logSecurityEvent } = require('../services/securityLogger');
+
 const errorHandler = (err, req, res, _next) => {
-  let statusCode = err.statusCode || 500;
+  let statusCode = err.statusCode || err.status || 500;
   let message = err.message || 'Internal server error';
 
   // Mongoose duplicate key
@@ -25,8 +27,12 @@ const errorHandler = (err, req, res, _next) => {
     res.setHeader('Retry-After', String(Math.ceil(err.retryAfterSeconds)));
   }
 
+  logSecurityEvent('request.error', req, {
+    statusCode,
+    errorType: typeof err.name === 'string' ? err.name : 'Error',
+  });
+
   if (process.env.NODE_ENV === 'development') {
-    console.error('❌', err);
     return res.status(statusCode).json({ error: message, stack: err.stack });
   }
 

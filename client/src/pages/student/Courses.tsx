@@ -432,6 +432,27 @@ export const CourseDetail: React.FC = () => {
     }
   };
 
+  const downloadAssignmentAttachment = async (url: string) => {
+    try {
+      const fileName = decodeURIComponent(new URL(url, window.location.origin).pathname.split('/').pop() || '');
+      if (!fileName) throw new Error('Attachment filename is missing.');
+
+      const { data } = await api.get(`/assignments/files/${encodeURIComponent(fileName)}`, {
+        responseType: 'blob',
+      });
+      const objectUrl = window.URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => window.URL.revokeObjectURL(objectUrl), 1000);
+    } catch {
+      toast('Could not download assignment attachment.', 'error');
+    }
+  };
+
   const removeAssignmentAttachment = (target: string) => {
     setAssignmentForm((prev) => ({
       ...prev,
@@ -929,15 +950,14 @@ export const CourseDetail: React.FC = () => {
                             {Array.isArray(assignment.attachments) && assignment.attachments.length > 0 && (
                               <div className="flex flex-wrap gap-2">
                                 {assignment.attachments.map((url) => (
-                                  <a
+                                  <button
                                     key={url}
-                                    href={url}
-                                    target="_blank"
-                                    rel="noreferrer"
+                                    type="button"
+                                    onClick={() => void downloadAssignmentAttachment(url)}
                                     className="text-xs font-medium text-primary hover:underline"
                                   >
                                     Attachment
-                                  </a>
+                                  </button>
                                 ))}
                               </div>
                             )}
@@ -1060,6 +1080,7 @@ export const CourseDetail: React.FC = () => {
                                 <input
                                   type="file"
                                   multiple
+                                  accept=".pdf,.png,.jpg,.jpeg,.webp"
                                   onChange={(event) => uploadAssignmentFiles(event.target.files)}
                                   className="block w-full text-xs text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-primary-foreground hover:file:bg-primary/90"
                                 />
@@ -1072,9 +1093,9 @@ export const CourseDetail: React.FC = () => {
                                 <div className="space-y-1">
                                   {assignmentForm.attachments.map((url) => (
                                     <div key={url} className="flex items-center justify-between gap-2 rounded-md border border-border px-2 py-1">
-                                      <a href={url} target="_blank" rel="noreferrer" className="text-xs text-primary hover:underline truncate">
+                                      <span className="text-xs text-muted-foreground truncate">
                                         {url.split('/').pop() || 'Attachment'}
-                                      </a>
+                                      </span>
                                       <button type="button" className="text-xs text-destructive" onClick={() => removeAssignmentAttachment(url)}>
                                         Remove
                                       </button>

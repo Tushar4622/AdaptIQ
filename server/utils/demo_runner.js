@@ -89,7 +89,7 @@ async function runDemo() {
   // STEP 3: STUDENT A (ARJUN) — WEAK IN CYBERSECURITY, STRONG IN FULL STACK
   // ───────────────────────────────────────────────────────────────────────────
   console.log('\n================================================================================');
-  console.log('👤 STEP 3: STUDENT A (Arjun Sharma) attempts the Quiz');
+  console.log('👤 STEP 3: STUDENT A attempts the Quiz');
   console.log('   Expected Profile: Strong in Full Stack (95%), Weak in Cybersecurity (30%)');
   console.log('================================================================================\n');
 
@@ -186,7 +186,7 @@ async function runDemo() {
   // STEP 4: STUDENT B (PRIYA) — WEAK IN FULL STACK, STRONG IN CYBERSECURITY
   // ───────────────────────────────────────────────────────────────────────────
   console.log('\n================================================================================');
-  console.log('👤 STEP 4: STUDENT B (Priya Patel) attempts the Quiz');
+  console.log('👤 STEP 4: STUDENT B attempts the Quiz');
   console.log('   Expected Profile: Weak in Full Stack (35%), Strong in Cybersecurity (92%)');
   console.log('================================================================================\n');
 
@@ -261,12 +261,12 @@ async function runDemo() {
   console.log('MASTER SYLLABUS (UNTOUCHED):');
   console.log('  1. Full Stack (Unit 1) -> 2. Cybersecurity (Unit 2) -> 3. Databases (Unit 3)\n');
 
-  console.log('STUDENT A (Arjun — Weak in Cyber, Strong in Full Stack):');
+  console.log('STUDENT A (Weak in Cyber, Strong in Full Stack):');
   console.log(`  Top Priority #1: ${arjunPersonalizedPlan.adaptedTopics[0].topicName} (${arjunPersonalizedPlan.adaptedTopics[0].skillArea}) -> EXPANDED`);
   console.log(`  Top Priority #2: ${arjunPersonalizedPlan.adaptedTopics[1].topicName} (${arjunPersonalizedPlan.adaptedTopics[1].skillArea}) -> EXPANDED`);
   console.log(`  Bottom Priority: ${arjunPersonalizedPlan.adaptedTopics[arjunPersonalizedPlan.adaptedTopics.length - 1].topicName} -> COMPRESSED (Advanced)\n`);
 
-  console.log('STUDENT B (Priya — Weak in Full Stack, Strong in Cyber):');
+  console.log('STUDENT B (Weak in Full Stack, Strong in Cyber):');
   console.log(`  Top Priority #1: ${priyaPersonalizedPlan.adaptedTopics[0].topicName} (${priyaPersonalizedPlan.adaptedTopics[0].skillArea}) -> EXPANDED`);
   console.log(`  Top Priority #2: ${priyaPersonalizedPlan.adaptedTopics[1].topicName} (${priyaPersonalizedPlan.adaptedTopics[1].skillArea}) -> EXPANDED`);
   console.log(`  Bottom Priority: ${priyaPersonalizedPlan.adaptedTopics[priyaPersonalizedPlan.adaptedTopics.length - 1].topicName} -> COMPRESSED (Advanced)\n`);
@@ -278,6 +278,6 @@ async function runDemo() {
 }
 
 runDemo().catch((err) => {
-  console.error('Demo error:', err);
+  console.error(`[demo] failed (${err?.name || 'Error'})`);
   process.exit(1);
 });

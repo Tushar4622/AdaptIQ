@@ -1,5 +1,6 @@
 const express = require('express');
 const { protect, restrictTo } = require('../middleware/auth');
+const { requireCourseAccess } = require('../middleware/objectAccess');
 const courseCtrl = require('../controllers/courseController');
 const { generateCourseDraft } = require('../controllers/aiController');
 const router = express.Router();
@@ -10,7 +11,12 @@ router.get('/enrolled', protect, restrictTo('student'), courseCtrl.getEnrolledCo
 router.post('/ai-draft', protect, restrictTo('teacher', 'admin'), generateCourseDraft);
 router.post('/', protect, restrictTo('teacher', 'admin'), courseCtrl.createCourse);
 router.get('/:id/analytics', protect, restrictTo('teacher', 'admin'), courseCtrl.getCourseAnalytics);
-router.get('/:id', protect, courseCtrl.getCourse);
+router.get(
+  '/:id',
+  protect,
+  requireCourseAccess({ param: 'id', allowEnrolledStudent: true, requirePublishedForStudent: true }),
+  courseCtrl.getCourse
+);
 router.put('/:id', protect, restrictTo('teacher', 'admin'), courseCtrl.updateCourse);
 router.delete('/:id', protect, restrictTo('teacher', 'admin'), courseCtrl.deleteCourse);
 router.post('/:id/enroll', protect, restrictTo('student'), courseCtrl.enrollCourse);

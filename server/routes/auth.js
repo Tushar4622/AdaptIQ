@@ -1,21 +1,47 @@
 // routes/auth.js
 const express = require('express');
-const { body } = require('express-validator');
 const router = express.Router();
-const { register, login, refresh, logout } = require('../controllers/authController');
+const {
+  register,
+  login,
+  logout,
+  csrf,
+  mfaSetup,
+  mfaVerify,
+  mfaVerifySetup,
+  refresh,
+} = require('../controllers/authController');
+const { createCsrfProtection } = require('../middleware/csrfProtection');
+const { createAuthRateLimiters } = require('../middleware/requestLimits');
+const { authSchemas, validateBody } = require('../middleware/requestValidation');
+const csrfProtection = createCsrfProtection();
+const limits = createAuthRateLimiters();
 
-router.post('/register', [
-  body('name').trim().isLength({ min: 2, max: 80 }).withMessage('Name must be 2–80 characters'),
-  body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
-  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
-], register);
+router.use(
+  ['/password-reset', '/forgot-password', '/reset-password', '/password/reset'],
+  limits.passwordReset
+);
 
-router.post('/login', [
-  body('email').isEmail().normalizeEmail(),
-  body('password').notEmpty(),
-], login);
+router.post('/register', limits.register, validateBody(authSchemas.register), register);
+router.post('/login', limits.login, validateBody(authSchemas.login), login);
+router.post('/mfa/setup', limits.mfa, csrfProtection, validateBody(authSchemas.mfaSetup), mfaSetup);
+router.post(
+  '/mfa/verify-setup',
+  limits.mfa,
+  csrfProtection,
+  validateBody(authSchemas.mfaSetupVerify),
+  mfaVerifySetup
+);
+router.post(
+  '/mfa/verify',
+  limits.mfa,
+  csrfProtection,
+  validateBody(authSchemas.mfaVerify),
+  mfaVerify
+);
 
-router.post('/refresh', refresh);
-router.post('/logout', logout);
+router.get('/csrf', csrf);
+router.post('/refresh', limits.refresh, csrfProtection, validateBody(authSchemas.refresh), refresh);
+router.post('/logout', csrfProtection, validateBody(authSchemas.logout), logout);
 
 module.exports = router;

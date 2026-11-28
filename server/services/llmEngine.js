@@ -575,7 +575,7 @@ exports.parseSyllabus = async ({ courseTitle, rawText }) => {
         return parsed;
       }
     } catch (err) {
-      console.warn('Gemini syllabus parse failed, falling back to deterministic parser:', err.message);
+      console.warn(`Gemini syllabus parse failed; using deterministic parser (${err?.name || 'Error'}).`);
     }
   }
 
@@ -615,7 +615,7 @@ exports.generateAdaptiveQuiz = async ({
         return questions;
       }
     } catch (err) {
-      console.warn('Gemini quiz generation failed, using psychometric fallback:', err.message);
+      console.warn(`Gemini quiz generation failed; using psychometric fallback (${err?.name || 'Error'}).`);
     }
   }
 
@@ -646,7 +646,7 @@ exports.evaluateDescriptiveAnswer = async ({ questionText, rubric, studentAnswer
         return evalResult;
       }
     } catch (err) {
-      console.warn('Gemini descriptive evaluation failed, using heuristic evaluation:', err.message);
+      console.warn(`Gemini descriptive evaluation failed; using heuristic evaluation (${err?.name || 'Error'}).`);
     }
   }
 
@@ -704,7 +704,7 @@ exports.generateDetailedResultReport = async ({
         return report;
       }
     } catch (err) {
-      console.warn('Gemini report generation failed, using rule-based diagnostic report:', err.message);
+      console.warn(`Gemini report generation failed; using rule-based report (${err?.name || 'Error'}).`);
     }
   }
 
@@ -803,7 +803,7 @@ exports.generatePersonalizedSyllabus = async ({ masterSyllabus, skillProfile }) 
         return plan;
       }
     } catch (err) {
-      console.warn('Gemini personalized syllabus generation failed, using rule-based generator:', err.message);
+      console.warn(`Gemini syllabus personalization failed; using rule-based generator (${err?.name || 'Error'}).`);
     }
   }
 

@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar } from '@/components/ui';
-import api from '@/lib/api';
+import api, { getAccessToken } from '@/lib/api';
 import {
   LayoutDashboard, BookOpen, Brain, Trophy, BarChart2,
   MessageSquare, Users, LogOut, Menu, X,
@@ -111,6 +111,7 @@ export const AppLayout: React.FC = () => {
     if (!user?._id) return;
 
     const socket = io(getSocketBaseUrl(), {
+      auth: (callback) => callback({ token: getAccessToken() }),
       withCredentials: true,
       transports: ['websocket', 'polling'],
     });

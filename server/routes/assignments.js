@@ -1,41 +1,59 @@
 // ─── Assignments ──────────────────────────────────────────────────────────────
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
+const crypto = require('node:crypto');
 const multer = require('multer');
 const assignmentRouter = express.Router();
 const { protect, restrictTo } = require('../middleware/auth');
+const {
+  requireAssignmentEnrollment,
+  requireSubmissionCourseOwner,
+} = require('../middleware/objectAccess');
 const { Assignment, Submission, Enrollment } = require('../models/index');
 const Course = require('../models/Course');
 const { addXpToUser, awardEligibleBadges } = require('../utils/gamification');
 const { createNotification, createNotifications } = require('../utils/notifications');
+const { validateRequestBody } = require('../middleware/requestValidation');
+const {
+  ASSIGNMENT_UPLOAD_DIR,
+  MAX_ASSIGNMENT_FILE_SIZE,
+  MAX_ASSIGNMENT_FILES,
+  processUploadedFiles,
+} = require('../services/assignmentUploads');
+const { createClamAvScanner } = require('../services/clamAvScanner');
 
-const assignmentUploadDir = path.join(__dirname, '..', 'uploads', 'assignments');
-fs.mkdirSync(assignmentUploadDir, { recursive: true });
+fs.mkdirSync(ASSIGNMENT_UPLOAD_DIR, { recursive: true, mode: 0o700 });
+const scanUploadedFile = createClamAvScanner();
 
 const assignmentStorage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, assignmentUploadDir),
-  filename: (_req, file, cb) => {
-    const safeName = String(file.originalname || 'file')
-      .replace(/[^a-zA-Z0-9._-]/g, '_')
-      .slice(-80);
-    const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    cb(null, `${unique}-${safeName}`);
-  },
+  destination: (_req, _file, cb) => cb(null, ASSIGNMENT_UPLOAD_DIR),
+  filename: (_req, _file, cb) => cb(null, crypto.randomUUID()),
 });
 
 const assignmentUpload = multer({
   storage: assignmentStorage,
   limits: {
-    fileSize: 10 * 1024 * 1024,
-    files: 8,
+    fileSize: MAX_ASSIGNMENT_FILE_SIZE,
+    files: MAX_ASSIGNMENT_FILES,
+    fieldSize: 100_000,
+    fields: 20,
+    parts: 30,
   },
 });
 
-const toPublicUploadUrl = (req, fileName) => {
-  const base = `${req.protocol}://${req.get('host')}`;
-  return `${base}/uploads/assignments/${fileName}`;
+const receiveAssignmentFiles = (req, res, next) => {
+  assignmentUpload.array('files', MAX_ASSIGNMENT_FILES)(req, res, (error) => {
+    if (!error) return next();
+    if (!(error instanceof multer.MulterError)) return next(error);
+
+    const isLimitError = error.code.startsWith('LIMIT_');
+    return res.status(isLimitError ? 413 : 400).json({
+      error: isLimitError ? 'Assignment upload limits were exceeded.' : 'Invalid multipart upload.',
+    });
+  });
 };
+
+const toPrivateUploadUrl = (fileName) => `/api/assignments/files/${fileName}`;
 
 const ensureTeacherOwnsCourse = (course, user) => {
   if (user.role === 'admin') return true;
@@ -89,26 +107,46 @@ assignmentRouter.get('/course/:courseId/my-submissions', protect, restrictTo('st
   }
 });
 
-assignmentRouter.post('/upload', protect, restrictTo('teacher', 'admin'), assignmentUpload.array('files', 8), async (req, res) => {
-  const files = Array.isArray(req.files) ? req.files : [];
+assignmentRouter.post(
+  '/upload',
+  protect,
+  restrictTo('teacher', 'admin'),
+  receiveAssignmentFiles,
+  validateRequestBody,
+  async (req, res, next) => {
+    const files = Array.isArray(req.files) ? req.files : [];
 
-  if (files.length === 0) {
-    return res.status(400).json({ error: 'Please upload at least one file.' });
+    if (files.length === 0) {
+      return res.status(400).json({ error: 'Please upload at least one file.' });
+    }
+
+    let processedFiles;
+    try {
+      processedFiles = await processUploadedFiles(files, {
+        storageDirectory: ASSIGNMENT_UPLOAD_DIR,
+        scanFile: scanUploadedFile,
+      });
+    } catch (error) {
+      if (error.statusCode) {
+        return res.status(error.statusCode).json({ error: error.message });
+      }
+      return next(error);
+    }
+
+    const uploadedFiles = processedFiles.map((file, index) => ({
+      name: `Attachment ${index + 1}.${file.extension}`,
+      fileName: file.fileName,
+      size: file.size,
+      mimeType: file.mimeType,
+      url: toPrivateUploadUrl(file.fileName),
+    }));
+
+    res.status(201).json({
+      files: uploadedFiles,
+      urls: uploadedFiles.map((file) => file.url),
+    });
   }
-
-  const uploadedFiles = files.map((file) => ({
-    name: file.originalname,
-    fileName: file.filename,
-    size: file.size,
-    mimeType: file.mimetype,
-    url: toPublicUploadUrl(req, file.filename),
-  }));
-
-  res.status(201).json({
-    files: uploadedFiles,
-    urls: uploadedFiles.map((file) => file.url),
-  });
-});
+);
 
 assignmentRouter.post('/', protect, restrictTo('teacher', 'admin'), async (req, res, next) => {
   try {
@@ -170,7 +208,7 @@ assignmentRouter.post('/', protect, restrictTo('teacher', 'admin'), async (req, 
   } catch (err) { next(err); }
 });
 
-assignmentRouter.post('/:id/submit', protect, restrictTo('student'), async (req, res, next) => {
+assignmentRouter.post('/:id/submit', protect, restrictTo('student'), requireAssignmentEnrollment, async (req, res, next) => {
   try {
     const assignment = await Assignment.findById(req.params.id).populate('course', 'title instructor');
     if (!assignment) return res.status(404).json({ error: 'Assignment not found.' });
@@ -212,7 +250,7 @@ assignmentRouter.post('/:id/submit', protect, restrictTo('student'), async (req,
   } catch (err) { next(err); }
 });
 
-assignmentRouter.put('/:id/grade', protect, restrictTo('teacher', 'admin'), async (req, res, next) => {
+assignmentRouter.put('/:id/grade', protect, restrictTo('teacher', 'admin'), requireSubmissionCourseOwner, async (req, res, next) => {
   try {
     const sub = await Submission.findByIdAndUpdate(
       req.params.id,

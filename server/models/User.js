@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
+const PASSWORD_BCRYPT_COST = 12;
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -21,7 +23,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, 'Password is required'],
-      minlength: [8, 'Password must be at least 8 characters'],
+      minlength: [12, 'Password must be at least 12 characters'],
+      maxlength: [72, 'Password cannot exceed 72 characters'],
       select: false,
     },
     role: {
@@ -73,9 +76,63 @@ const userSchema = new mongoose.Schema(
       type: String,
       select: false,
     },
+    refreshTokenFamilyId: {
+      type: String,
+      select: false,
+    },
+    refreshTokenFamilyExpiresAt: {
+      type: Date,
+      select: false,
+    },
+    refreshTokenHistory: {
+      type: [{
+        _id: false,
+        familyId: { type: String, required: true },
+        tokenHash: { type: String, required: true },
+        usedAt: { type: Date, required: true },
+      }],
+      default: [],
+      select: false,
+    },
     isActive: {
       type: Boolean,
       default: true,
+    },
+    failedLoginAttempts: {
+      type: Number,
+      default: 0,
+      select: false,
+    },
+    loginLockedUntil: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+    mfaEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    mfaSecretEncrypted: {
+      type: String,
+      select: false,
+    },
+    mfaPendingSecretEncrypted: {
+      type: String,
+      select: false,
+    },
+    mfaSetupExpiresAt: {
+      type: Date,
+      select: false,
+    },
+    mfaRecoveryCodeHashes: {
+      type: [String],
+      default: [],
+      select: false,
+    },
+    mfaLastUsedStep: {
+      type: Number,
+      default: -1,
+      select: false,
     },
     passwordChangedAt: Date,
   },
@@ -89,7 +146,7 @@ const userSchema = new mongoose.Schema(
 // Hash password before saving
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
+  this.password = await bcrypt.hash(this.password, PASSWORD_BCRYPT_COST);
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
@@ -117,4 +174,5 @@ userSchema.virtual('enrolledCoursesCount', {
 });
 
 const User = mongoose.model('User', userSchema);
+User.PASSWORD_BCRYPT_COST = PASSWORD_BCRYPT_COST;
 module.exports = User;

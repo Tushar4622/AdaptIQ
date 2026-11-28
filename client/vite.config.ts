@@ -9,9 +9,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
-      nodePolyfills({
-        include: ['buffer', 'events', 'process', 'stream', 'util'],
-      }),
+      nodePolyfills(),
     ],
     define: {
       global: 'globalThis',

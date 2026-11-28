@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 // Topic Sub-Schema
 const topicSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
-  code: { type: String, trim: true, uppercase: true },
+  name: { type: String, required: true, trim: true, maxlength: 160 },
+  code: { type: String, trim: true, uppercase: true, maxlength: 40 },
   skillArea: {
     type: String,
     required: true,
@@ -24,18 +24,27 @@ const topicSchema = new mongoose.Schema({
     enum: ['Easy', 'Moderate', 'Tough'],
     default: 'Moderate',
   },
-  description: { type: String, default: '' },
-  prerequisites: [{ type: String, trim: true }], // Prerequisite topic names or codes
-  subtopics: [{ type: String, trim: true }],
-  estimatedHours: { type: Number, default: 4 },
+  description: { type: String, default: '', maxlength: 4000 },
+  prerequisites: {
+    type: [{ type: String, trim: true, maxlength: 160 }],
+    validate: [(items) => items.length <= 100, 'A topic cannot have more than 100 prerequisites.'],
+  },
+  subtopics: {
+    type: [{ type: String, trim: true, maxlength: 160 }],
+    validate: [(items) => items.length <= 100, 'A topic cannot have more than 100 subtopics.'],
+  },
+  estimatedHours: { type: Number, default: 4, min: 0, max: 500 },
 });
 
 // Unit Sub-Schema
 const unitSchema = new mongoose.Schema({
-  unitNumber: { type: Number, required: true },
-  title: { type: String, required: true, trim: true },
-  description: { type: String, default: '' },
-  topics: [topicSchema],
+  unitNumber: { type: Number, required: true, min: 1, max: 100 },
+  title: { type: String, required: true, trim: true, maxlength: 160 },
+  description: { type: String, default: '', maxlength: 4000 },
+  topics: {
+    type: [topicSchema],
+    validate: [(items) => items.length <= 100, 'A unit cannot contain more than 100 topics.'],
+  },
 });
 
 // Master Syllabus Schema
@@ -48,11 +57,14 @@ const masterSyllabusSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    title: { type: String, required: true, trim: true },
-    version: { type: Number, default: 1 },
+    title: { type: String, required: true, trim: true, maxlength: 200 },
+    version: { type: Number, default: 1, min: 1 },
     isMaster: { type: Boolean, default: true },
-    units: [unitSchema],
-    rawSourceText: { type: String, default: '' },
+    units: {
+      type: [unitSchema],
+      validate: [(items) => items.length <= 100, 'A syllabus cannot contain more than 100 units.'],
+    },
+    rawSourceText: { type: String, default: '', maxlength: 100_000 },
     parsedByAI: { type: Boolean, default: false },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -61,9 +73,9 @@ const masterSyllabusSchema = new mongoose.Schema(
     },
     versionHistory: [
       {
-        versionNumber: Number,
+        versionNumber: { type: Number, min: 1 },
         updatedAt: { type: Date, default: Date.now },
-        changeLog: String,
+        changeLog: { type: String, maxlength: 2000 },
         updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
       },
     ],
@@ -71,6 +83,10 @@ const masterSyllabusSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+masterSyllabusSchema.path('versionHistory').validate(
+  (history) => Array.isArray(history) && history.length <= 50,
+  'A syllabus cannot retain more than 50 versions.'
+);
 masterSyllabusSchema.index({ course: 1, isMaster: 1 });
 
 const MasterSyllabus = mongoose.model('MasterSyllabus', masterSyllabusSchema);

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
-import api from '@/lib/api';
+import api, { getAccessToken } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import {
   Alert,
@@ -387,6 +387,7 @@ export const LiveClassRoomPage: React.FC = () => {
     if (!classId || !user?._id) return;
 
     const socket = io(getSocketBaseUrl(), {
+      auth: (callback) => callback({ token: getAccessToken() }),
       withCredentials: true,
       transports: ['websocket', 'polling'],
     });
@@ -396,9 +397,6 @@ export const LiveClassRoomPage: React.FC = () => {
     const joinLiveRoom = () => {
       socket.emit('join-live-class', {
         classId,
-        userId: user._id,
-        name: user.name,
-        role: user.role,
       });
     };
 
@@ -493,8 +491,6 @@ export const LiveClassRoomPage: React.FC = () => {
     handleSignal,
     syncParticipants,
     user?._id,
-    user?.name,
-    user?.role,
   ]);
 
   useEffect(() => {

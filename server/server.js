@@ -7,24 +7,34 @@ try {
     console.error(`[startup] ${keyName} is missing. AI generation is unavailable; non-AI LMS features will continue to run.`);
   }
 } catch (error) {
-  console.error(`[startup] AI provider configuration error: ${error.message}`);
+  console.error(`[startup] AI provider configuration failed (${error?.name || 'Error'}).`);
 }
 if (!/^[a-f0-9]{64}$/i.test(process.env.FACE_DATA_ENCRYPTION_KEY || '')) {
   console.warn('[startup] FACE_DATA_ENCRYPTION_KEY is missing or invalid. Face enrollment is unavailable.');
 }
+if (!/^[a-f0-9]{64}$/i.test(process.env.MFA_ENCRYPTION_KEY || '')) {
+  console.warn('[startup] MFA_ENCRYPTION_KEY is missing or invalid. Teacher/admin MFA sign-in and setup are unavailable.');
+}
 const express = require('express');
 const http = require('http');
-const path = require('path');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
-const morgan = require('morgan');
 const rateLimitPackage = require('express-rate-limit');
 const rateLimit = rateLimitPackage.rateLimit || rateLimitPackage;
 const jwt = require('jsonwebtoken');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 const { loadFaceVerifier } = require('./services/faceVerifierLoader');
+const { createSocketSecurity } = require('./services/socketSecurity');
+const requestId = require('./middleware/requestId');
+const { auditDeniedRequests } = require('./middleware/securityAudit');
+const { validatePagination } = require('./middleware/paginationValidation');
+const {
+  JSON_BODY_LIMIT,
+  validateRequestBody,
+} = require('./middleware/requestValidation');
 
 // Route imports
 const authRoutes = require('./routes/auth');
@@ -32,6 +42,7 @@ const userRoutes = require('./routes/users');
 const courseRoutes = require('./routes/courses');
 const quizRoutes = require('./routes/quizzes');
 const assignmentRoutes = require('./routes/assignments');
+const assignmentFileRoutes = require('./routes/assignmentFiles');
 const badgeRoutes = require('./routes/badges');
 const discussionRoutes = require('./routes/discussions');
 const skillRoutes = require('./routes/skills');
@@ -50,15 +61,26 @@ try {
   if (app.locals.faceVerifier) console.log('[startup] Server-side face verifier loaded.');
 } catch (error) {
   app.locals.faceVerifier = null;
-  console.error(`[startup] Face verifier unavailable: ${error.message}`);
+  console.error(`[startup] Face verifier unavailable (${error?.name || 'Error'}).`);
 }
 
 app.disable('x-powered-by');
+app.use(requestId);
+app.use(auditDeniedRequests);
 
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+const configuredOrigins = (process.env.CLIENT_URL || '')
   .split(',')
   .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean);
+const allowedOrigins =
+  configuredOrigins.length > 0
+    ? configuredOrigins
+    : process.env.NODE_ENV === 'production'
+      ? []
+      : ['http://localhost:5173'];
+if (allowedOrigins.length === 0) {
+  throw new Error('CLIENT_URL must define at least one allowed browser origin in production.');
+}
 
 const corsOptions = {
   origin(origin, callback) {
@@ -66,9 +88,11 @@ const corsOptions = {
     if (!origin) return callback(null, true);
     const normalizedOrigin = origin.replace(/\/+$/, '');
     if (allowedOrigins.includes(normalizedOrigin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'));
+    return callback(Object.assign(new Error('Not allowed by CORS'), { statusCode: 403 }));
   },
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Auth-Token-Mode'],
+  exposedHeaders: ['X-Request-ID'],
 };
 
 // Socket.io for real-time discussions
@@ -142,14 +166,12 @@ const authLimiter = rateLimit({
 app.use('/api/auth', authLimiter);
 
 // Body parsing
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Logging (development only)
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-}
+app.use('/api/attendance/face/enroll', express.json({ limit: '16mb' }));
+app.use(express.json({ limit: JSON_BODY_LIMIT }));
+app.use(express.urlencoded({ extended: true, limit: '1mb', parameterLimit: 500 }));
+app.use(cookieParser());
+app.use('/api', validatePagination);
+app.use('/api', validateRequestBody);
 
 // Attach io to request for use in controllers
 app.use((req, _res, next) => {
@@ -165,6 +187,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/quizzes', quizRoutes);
+app.use('/uploads/assignments', assignmentFileRoutes);
+app.use('/api/assignments/files', assignmentFileRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/discussions', discussionRoutes);
@@ -182,137 +206,8 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', environment: process.env.NODE_ENV, timestamp: new Date() });
 });
 
-// Socket.io — real-time discussions
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-
-  const getLiveClassParticipants = (classId) => {
-    const roomName = `live-class:${classId}`;
-    const room = io.sockets.adapter.rooms.get(roomName);
-    if (!room) return [];
-
-    return Array.from(room)
-      .map((socketId) => {
-        const peer = io.sockets.sockets.get(socketId);
-        const meta = peer?.data?.liveClassMeta;
-        if (!meta) return null;
-
-        return {
-          socketId,
-          userId: String(meta.userId),
-          name: meta.name || 'User',
-          role: meta.role || 'student',
-        };
-      })
-      .filter(Boolean);
-  };
-
-  const leaveLiveClass = () => {
-    const meta = socket.data.liveClassMeta;
-    if (!meta?.classId) return;
-
-    const roomName = `live-class:${meta.classId}`;
-    socket.leave(roomName);
-
-    io.to(roomName).emit('live-class:presence', {
-      type: 'left',
-      socketId: socket.id,
-      userId: String(meta.userId),
-    });
-
-    socket.data.liveClassMeta = null;
-  };
-
-  socket.on('join-user', (userId) => {
-    if (!userId) return;
-    socket.join(`user:${userId}`);
-  });
-
-  socket.on('leave-user', (userId) => {
-    if (!userId) return;
-    socket.leave(`user:${userId}`);
-  });
-
-  socket.on('join-course', (courseId) => {
-    socket.join(`course:${courseId}`);
-  });
-
-  socket.on('join-chat', (chatId) => {
-    socket.join(`chat:${chatId}`);
-  });
-
-  socket.on('leave-course', (courseId) => {
-    socket.leave(`course:${courseId}`);
-  });
-
-  socket.on('leave-chat', (chatId) => {
-    socket.leave(`chat:${chatId}`);
-  });
-
-  socket.on('join-live-class', (payload = {}) => {
-    const classId = String(payload.classId || '').trim();
-    const userId = String(payload.userId || '').trim();
-
-    if (!classId || !userId) return;
-
-    leaveLiveClass();
-
-    const roomName = `live-class:${classId}`;
-    socket.join(roomName);
-    socket.join(`live-user:${userId}`);
-
-    socket.data.liveClassMeta = {
-      classId,
-      userId,
-      name: String(payload.name || 'User').trim(),
-      role: String(payload.role || 'student').trim(),
-    };
-
-    socket.emit('live-class:participants', getLiveClassParticipants(classId));
-
-    io.to(roomName).emit('live-class:presence', {
-      type: 'joined',
-      socketId: socket.id,
-      userId,
-      name: socket.data.liveClassMeta.name,
-      role: socket.data.liveClassMeta.role,
-    });
-  });
-
-  socket.on('leave-live-class', () => {
-    leaveLiveClass();
-  });
-
-  socket.on('live-class:webrtc-signal', (payload = {}) => {
-    const classId = String(payload.classId || '').trim();
-    const targetSocketId = String(payload.targetSocketId || '').trim();
-    if (!classId || !targetSocketId || !payload.signal) return;
-
-    io.to(targetSocketId).emit('live-class:webrtc-signal', {
-      classId,
-      fromSocketId: socket.id,
-      fromUserId: String(socket.data.liveClassMeta?.userId || ''),
-      signal: payload.signal,
-    });
-  });
-
-  socket.on('live-class:camera-state', (payload = {}) => {
-    const classId = String(payload.classId || '').trim();
-    if (!classId) return;
-
-    io.to(`live-class:${classId}`).emit('live-class:camera-state', {
-      classId,
-      socketId: socket.id,
-      userId: String(socket.data.liveClassMeta?.userId || ''),
-      cameraOn: Boolean(payload.cameraOn),
-    });
-  });
-
-  socket.on('disconnect', () => {
-    leaveLiveClass();
-    console.log('Client disconnected:', socket.id);
-  });
-});
+// Socket.IO connections and events use the same access-token and object-access rules as the API.
+createSocketSecurity().install(io);
 
 // Global error handler (must be last)
 app.use(errorHandler);

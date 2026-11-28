@@ -17,6 +17,12 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (
+      decoded.tokenUse !== undefined &&
+      decoded.tokenUse !== 'access'
+    ) {
+      return res.status(401).json({ error: 'Invalid authentication token.' });
+    }
     const user = await User.findById(decoded.id).select('-password -refreshToken');
 
     if (!user) {
@@ -25,6 +31,13 @@ const protect = async (req, res, next) => {
 
     if (!user.isActive) {
       return res.status(403).json({ error: 'Account has been deactivated. Contact support.' });
+    }
+
+    if (['teacher', 'admin'].includes(user.role) && !user.mfaEnabled) {
+      return res.status(403).json({
+        error: 'Multi-factor authentication setup is required.',
+        code: 'MFA_SETUP_REQUIRED',
+      });
     }
 
     req.user = user;

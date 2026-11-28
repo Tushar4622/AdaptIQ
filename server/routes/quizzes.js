@@ -1,6 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { protect, restrictTo } = require('../middleware/auth');
+const {
+  requireQuizAccess,
+  requireCourseOwner,
+  requireAttemptAccess,
+} = require('../middleware/objectAccess');
 const { Quiz, QuizAttempt, Enrollment, Concept, LearnerMastery, AuditLog } = require('../models/index');
 const { getQuizFeedback, generateAdaptiveMCQs } = require('../controllers/aiController');
 const quizAdvancedCtrl = require('../controllers/quizAdvancedController');
@@ -45,7 +50,7 @@ router.get('/course/:courseId', protect, async (req, res, next) => {
 });
 
 // GET /api/quizzes/:id  (with answers — teacher/admin only)
-router.get('/:id', protect, async (req, res, next) => {
+router.get('/:id', protect, requireQuizAccess('view'), async (req, res, next) => {
   try {
     const quiz = await Quiz.findById(req.params.id).populate('course', 'title instructor');
     if (!quiz) return res.status(404).json({ error: 'Quiz not found.' });
@@ -296,15 +301,25 @@ router.post('/:id/publish-approved', protect, restrictTo('teacher', 'admin'), as
 });
 
 // PUT /api/quizzes/:id
-router.put('/:id', protect, restrictTo('teacher', 'admin'), async (req, res, next) => {
+router.put('/:id', protect, restrictTo('teacher', 'admin'), requireQuizAccess('manage'), async (req, res, next) => {
   try {
-    const quiz = await Quiz.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updates = {};
+    for (const field of ['title', 'description', 'timeLimit', 'passingScore', 'questions', 'isPublished', 'xpReward']) {
+      if (Object.prototype.hasOwnProperty.call(req.body || {}, field)) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    const quiz = await Quiz.findByIdAndUpdate(req.params.id, updates, {
+      new: true,
+      runValidators: true,
+    });
     res.json({ quiz });
   } catch (err) { next(err); }
 });
 
 // POST /api/quizzes/:id/attempt
-router.post('/:id/attempt', protect, restrictTo('student'), async (req, res, next) => {
+router.post('/:id/attempt', protect, restrictTo('student'), requireQuizAccess('attempt'), async (req, res, next) => {
   try {
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) return res.status(404).json({ error: 'Quiz not found.' });
@@ -457,10 +472,39 @@ router.get('/:id/results', protect, async (req, res, next) => {
 router.post('/feedback', protect, getQuizFeedback);
 
 // ── Advanced Adaptive AI Assessment & Evaluation Routes ──────────────────────
-router.post('/generate-advanced', protect, restrictTo('teacher', 'admin'), quizAdvancedCtrl.generateAdaptiveQuiz);
-router.post('/upload-quiz', protect, restrictTo('teacher', 'admin'), quizAdvancedCtrl.uploadQuizWithAutoTag);
-router.post('/:id/submit-advanced', protect, restrictTo('student'), quizAdvancedCtrl.evaluateAndGenerateReport);
-router.get('/class-analytics/:courseId', protect, restrictTo('teacher', 'admin'), quizAdvancedCtrl.getClassAnalytics);
-router.get('/attempts/:attemptId/report', protect, quizAdvancedCtrl.getAttemptDetailedReport);
+router.post(
+  '/generate-advanced',
+  protect,
+  restrictTo('teacher', 'admin'),
+  requireCourseOwner({ body: 'courseId' }),
+  quizAdvancedCtrl.generateAdaptiveQuiz
+);
+router.post(
+  '/upload-quiz',
+  protect,
+  restrictTo('teacher', 'admin'),
+  requireCourseOwner({ body: 'courseId' }),
+  quizAdvancedCtrl.uploadQuizWithAutoTag
+);
+router.post(
+  '/:id/submit-advanced',
+  protect,
+  restrictTo('student'),
+  requireQuizAccess('attempt'),
+  quizAdvancedCtrl.evaluateAndGenerateReport
+);
+router.get(
+  '/class-analytics/:courseId',
+  protect,
+  restrictTo('teacher', 'admin'),
+  requireCourseOwner({ param: 'courseId' }),
+  quizAdvancedCtrl.getClassAnalytics
+);
+router.get(
+  '/attempts/:attemptId/report',
+  protect,
+  requireAttemptAccess,
+  quizAdvancedCtrl.getAttemptDetailedReport
+);
 
 module.exports = router;

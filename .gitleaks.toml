@@ -1,0 +1,10 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "seed-account-password"
+description = "Hardcoded seed account password"
+regex = '''(?i)password\s*:\s*['"]([^'"]+)['"]'''
+path = '''(?i)server/utils/seed\.js'''
+secretGroup = 1
+keywords = ["password"]
